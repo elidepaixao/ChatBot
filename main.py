@@ -34,6 +34,10 @@
 import streamlit as st
 # Streamlit (st): biblioteca para criar a interface web do chatbot
 # ============================================================================
+from openai import OpenAI
+# OpenAI: biblioteca para interagir com a API da OpenAI (modelo de IA)
+
+modelo_ia = OpenAI(api_key="")
 
 
 # ============================================================================
@@ -44,6 +48,13 @@ st.write("# Chatbot com IA")
 # O símbolo "#" no texto aplica formatação Markdown (título grande)
 # ============================================================================
 
+# Apos o passo de gerar e exibir a resposta da IA, adicionar o seguinte bloco:
+# explicacao: criar uma lista de mensagens vazia somente se a lista nao existir
+# para isso utilizaremos st.session_state, que guarda dados entre interacoes, como os cookies do navegador
+# quando o usuario entrar a primeira vez no site, sera verificado se ja exite esse "cookie", eessa lista de mensagens
+# se nao existir a lista de mensagens, ela sera criada como uma lista vazia se ja exisitir, nao sera criada.
+if not "lista_mensagens" in st.session_state:
+    st.session_state["lista_mensagens"] = []
 
 # ============================================================================
 # COMO EXECUTAR O PROJETO
@@ -66,7 +77,12 @@ texto_usuario = st.chat_input("Digite sua mensagem")
 # Retorna o texto digitado pelo usuário quando ele pressiona Enter
 # O texto é armazenado na variável "texto_usuario"
 # ============================================================================
-
+# Depois de adcionar as mensagens do usuario e da ia em suas respectivas listas, adicionar o seguinte bloco:
+for mensagem in st.session_state["lista_mensagens"]:
+    role = mensagem["role"]
+    content = mensagem["content"]
+    st.chat_message(role).write(content)
+# Loop que percorre todas as mensagens armazenadas em st.session_state["lista_mensagens"]
 
 # ============================================================================
 # PROCESSAMENTO DA MENSAGEM DO USUÁRIO
@@ -89,27 +105,32 @@ if texto_usuario:
     #   - Qualquer texto: exibe a primeira letra como ícone
     # .write(): exibe o conteúdo dentro do balão de mensagem
     # ------------------------------------------------------------------------
-    
-    
+
+    mensagem_usuario = {"role": "user", "content": texto_usuario}
+    # criando a estrutura de mensagem do usuario como um dicionario
+    st.session_state["lista_mensagens"].append(mensagem_usuario)
+    # adicionando a mensagem do usuario na lista de mensagens armazenada em st.session_state
     # ------------------------------------------------------------------------
     # GERAR E EXIBIR RESPOSTA DA IA
     # ------------------------------------------------------------------------
-    resposta_ia = "Voce perguntou: " + texto_usuario
+    resposta_ia = modelo_ia.chat.completions.create(
+        messages=st.session_state["lista_mensagens"],
+        model="gpt-4o"
+    )
+    texto_resposta_ia = resposta_ia.choices[0].message.content
+    # Aqui a resposta é obtida chamando a API da OpenAI com a lista de mensagens como contexto
+    #texto_resposta_ia = "Voce perguntou: " + texto_usuario
     # Aqui a resposta é apenas um exemplo fixo (eco da mensagem do usuário)
     # Futuramente, será substituída por uma chamada real à API da OpenAI
     
-    st.chat_messsage("assistant").write(resposta_ia)
+    st.chat_message("assistant").write(texto_resposta_ia)
     # Exibe a resposta da IA no chat com ícone de assistente
-    # ------------------------------------------------------------------------
-    
-    
-    # ========================================================================
-    # PROBLEMA IDENTIFICADO
-    # ========================================================================
-    # A estrutura atual funciona, mas tem duas limitações:
-    # 1. A resposta da IA está fixa (não é uma resposta real)
-    # 2. Não há histórico do chat (mensagens anteriores desaparecem)
-    #
-    # PRÓXIMO PASSO:
-    # Implementar armazenamento de histórico usando listas e dicionários
-    # ========================================================================
+
+    mensagem_ia = {"role": "assistant", "content": texto_resposta_ia}
+    # criando a estrutura de mensagem da ia como um dicionario
+    st.session_state["lista_mensagens"].append(mensagem_ia)
+    # adicionando a mensagem da ia na lista de mensagens armazenada em st.session_state
+
+
+
+
