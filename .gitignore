@@ -1,5 +1,23 @@
-venv/
+# Arquivos de ambiente e credenciais
+.env
+.streamlit/
+
+# Cache do Python
 __pycache__/
 *.pyc
 *.pyo
-.env
+*.pyd
+
+# Ambientes virtuais
+venv/
+env/
+.venv/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Outros
+.DS_Store
