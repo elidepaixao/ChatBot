@@ -37,7 +37,7 @@ import streamlit as st
 from openai import OpenAI
 # OpenAI: biblioteca para interagir com a API da OpenAI (modelo de IA)
 
-modelo_ia = OpenAI(api_key="")
+modelo_ia = OpenAI(api_key="testando123")
 
 
 # ============================================================================
