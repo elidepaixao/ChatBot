@@ -37,7 +37,24 @@ import streamlit as st
 from openai import OpenAI
 # OpenAI: biblioteca para interagir com a API da OpenAI (modelo de IA)
 
-modelo_ia = OpenAI(api_key="testando123")
+#modelo_ia = OpenAI(api_key="testando123")
+# ============================================================================
+# CARREGANDO A API KEY DE FORMA SEGURA
+# ============================================================================
+from dotenv import load_dotenv
+import os
+
+load_dotenv()  # Carrega as variáveis do arquivo .env
+
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    st.error("⚠️ API Key da OpenAI não encontrada! Configure o arquivo .env")
+    st.stop()
+
+modelo_ia = OpenAI(api_key=api_key)
+# ============================================================================
+
+
 
 
 # ============================================================================
